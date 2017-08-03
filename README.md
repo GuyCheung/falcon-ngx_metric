@@ -44,7 +44,7 @@ Nginx+Lua
 
 ``` shell
 mkdir ${NGINX_HOME}/modules
-cp lua/* ${NGINX_HOME}/modules/
+cp -r lua/* ${NGINX_HOME}/modules/
 ```
 
 * nginx配置文件加载
