@@ -4,7 +4,12 @@
 import sys, urllib, time, json, traceback
 from optparse import OptionParser
 
-NG_STATUS_URI = 'http://127.0.0.1:9091/monitor/basic_status'
+DEFAULT_TIMEOUT_HTTP = 3.0
+ 
+DEFAULT_STATUS_HOST_PORT = "127.0.0.1:9091"
+NG_STATUS_URI = 'http://{addr}/monitor/basic_status'
+
+DEFAULT_FALCON_AGENT_PUSH_URI = "http://127.0.0.1:1988/v1/push"
 
 class Histogram(object):
 
@@ -442,7 +447,7 @@ def collect():
     datapoints = []
 
     try:
-        content = urllib.urlopen(NG_STATUS_URI).read()
+        content = urllib.urlopen(NG_STATUS_URI.format(addr=options.ngx_addr)).read()
         ts = int(time.time())
 
         for line in content.splitlines():
@@ -457,7 +462,7 @@ def collect():
 
         if options.format == 'falcon' and options.falcon_addr != '':
             import requests
-            r = requests.post(options.falcon_addr, data=json.dumps(datapoints))
+            r = requests.post(options.falcon_addr, data=json.dumps(datapoints), timeout=DEFAULT_TIMEOUT_HTTP)
             print "push to falcon result: " + r.text
 
         else:
@@ -471,12 +476,23 @@ def collect():
 
 if __name__ == "__main__":
     parser = OptionParser()
+    parser.add_option('--ngx-addr', 
+            dest="ngx_addr", type='str', 
+            default=DEFAULT_STATUS_HOST_PORT, 
+            help='address of NGINX status, default is {addr}'.format(
+                addr=DEFAULT_STATUS_HOST_PORT
+            ))
     parser.add_option('--use-ngx-host', action='store_true', dest='use_ngx_host', default=False, help='use the ngx collect lib output host as service column, default read self')
     parser.add_option('--service', dest='service', default='ngx_metric', help='logic service name(endpoint in falcon) of metrics, use nginx service_name as the value when --use-ngx-host specified. default is ngx_metric')
     parser.add_option('--format', dest='format', default='odin', help='output format, valid values "odin|falcon", default is odin')
 
     parser.add_option('--falcon-step', dest='falcon_step', type='int', default=60, help='Falcon only. metric step')
-    parser.add_option('--falcon-addr', dest='falcon_addr', default='', help='Falcon only, the addr of falcon push api')
+    parser.add_option('--falcon-addr', 
+            dest='falcon_addr', 
+            default=DEFAULT_FALCON_AGENT_PUSH_URI, 
+            help='Falcon only, the URI of falcon agent push api, default is {addr}'.format(
+                addr=DEFAULT_FALCON_AGENT_PUSH_URI
+                ))
 
     parser.add_option('--ngx-out-sep', dest='ngx_out_sep', default='|', help='ngx output status seperator, default is "|"')
 
