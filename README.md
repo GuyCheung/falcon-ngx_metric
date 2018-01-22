@@ -80,7 +80,7 @@ server {
 ```shell
 pip install requests   # 可选，使用`--falcon-addr`时需要执行
 
-python nginx_collect.py --format=falcon
+python nginx_collect.py --format=falcon --falcon-addr=http://127.0.0.1:1988/v1/push
 ```
 
 * 将脚本加入crontab
@@ -117,7 +117,7 @@ Options:
 >
 > `--falcon-step`: falcon step设置，请设置为python脚本调用频率，默认是60
 >
-> `--falcon-addr`: falcon push接口设置，设置该参数数据直接推送，不再输出到终端。需要安装`requests`模块
+> `--falcon-addr`: falcon agent 模块push接口设置，设置该参数数据直接推送，不再输出到终端。需要安装`requests`模块
 
 ## Screenshot
 
