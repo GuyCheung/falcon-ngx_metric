@@ -73,7 +73,7 @@ function _M.upstream_time(self)
     local resp_time_arr = util.str_split(upstream_response_time_s, ",")
 
     local metric = self:req_sign("upstream_contacts")
-    counter.add(self.dict, metric, #(resp_time_arr) - 1)
+    counter.add(self.dict, metric, #(resp_time_arr))
 
     local duration = 0.0
     for _, t in pairs(resp_time_arr) do
